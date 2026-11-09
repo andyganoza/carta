@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- =====================  CONFIGURACIÓN  =====================
+  Pega entre las comillas el enlace de tu hoja de Google con la carta.
+  Sirve el enlace normal de "Compartir" (con acceso "Cualquier persona
+  que tenga el enlace") o el de "Publicar en la Web".
+  Si lo dejas vacío, la carta se lee del archivo carta.csv.
+============================================================== -->
+<script>window.HOJA_DE_GOOGLE = "";</script>
+<title>Carta Bellaqueo</title>
+<meta name="description" content="Mira la carta de Bellaqueo desde tu celular.">
+<meta property="og:title" content="Carta Bellaqueo">
+<meta property="og:description" content="Mira la carta de Bellaqueo desde tu celular.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#F5EDDC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1D1411" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2396362A'/%3E%3Ctext x='32' y='45' font-family='Georgia,serif' font-size='38' font-weight='700' text-anchor='middle' fill='%23F5EDDC'%3EB%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&amp;display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Una columna para celular: encabezado como la carta impresa, barra de categorías fija y filas con puntos guía hasta el precio */
+  --papel: #F5EDDC;
+  --tinta: #2E211A;
+  --ladrillo: #96362A;
+  --sepia: #6F5C4C;
+  --caja: #8F3B2B;
+  --sobre-caja: #F7EFDF;
+  --serif: "Fraunces", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --barra: 3.75rem;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --papel: #1D1411;
+    --tinta: #F2E7D3;
+    --ladrillo: #E39178;
+    --sepia: #B8A691;
+    --caja: #7E2E20;
+    --sobre-caja: #F7EFDF;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --papel: #1D1411;
+  --tinta: #F2E7D3;
+  --ladrillo: #E39178;
+  --sepia: #B8A691;
+  --caja: #7E2E20;
+  --sobre-caja: #F7EFDF;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--papel);
+  color: var(--tinta);
+  font-family: var(--serif);
+  font-size: 1.0625rem;
+  line-height: 1.4;
+}
+.pagina { max-width: 34rem; margin: 0 auto; padding: 0 1.25rem 2.5rem; }
+
+.cabecera { padding: 2.25rem 0 1.25rem; text-align: center; }
+.cabecera h1 { margin: 0; display: grid; gap: .625rem; justify-items: center; font-weight: 400; }
+.cabecera .carta {
+  font-size: clamp(3.75rem, 21vw, 6rem);
+  font-weight: 900;
+  line-height: .9;
+  letter-spacing: .01em;
+  text-transform: uppercase;
+  color: var(--ladrillo);
+}
+.cabecera .local {
+  font-size: clamp(1.125rem, 5.2vw, 1.5rem);
+  font-weight: 500;
+  letter-spacing: .42em;
+  margin-right: -.42em;
+  text-transform: uppercase;
+}
+.adorno { display: block; width: min(15rem, 72%); height: auto; margin: 1rem auto 0; color: var(--ladrillo); }
+
+.categorias { position: sticky; top: 0; z-index: 5; margin: 0 -1.25rem; background: var(--papel); }
+.categorias::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: var(--sepia); opacity: .3;
+}
+.chips {
+  position: relative;
+  display: flex;
+  gap: .5rem;
+  overflow-x: auto;
+  padding: .625rem 1.25rem;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.chips::-webkit-scrollbar { display: none; }
+.chip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0 1rem;
+  border: 1px solid var(--sepia);
+  border-radius: 999px;
+  color: var(--tinta);
+  font-size: .9375rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.chip[aria-current="true"] { background: var(--ladrillo); border-color: var(--ladrillo); color: var(--papel); }
+.chip:focus-visible { outline: 2px solid var(--ladrillo); outline-offset: 2px; }
+
+.estado { margin: 2rem 0 0; color: var(--sepia); font-style: italic; text-align: center; }
+.estado p { margin: 0 auto; max-width: 30ch; }
+.reintentar {
+  margin-top: 1rem;
+  min-height: 2.75rem;
+  padding: 0 1.25rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ladrillo);
+  color: var(--papel);
+  font: inherit;
+  font-style: normal;
+  font-weight: 700;
+  cursor: pointer;
+}
+.reintentar:focus-visible { outline: 2px solid var(--ladrillo); outline-offset: 3px; }
+.aviso {
+  margin: 1.25rem 0 0;
+  padding: .75rem 1rem;
+  border: 1px solid var(--ladrillo);
+  font-size: .9375rem;
+}
+
+.seccion { padding-top: 1.75rem; scroll-margin-top: var(--barra); }
+.seccion h2 {
+  margin: 0 0 .75rem;
+  font-size: 1.375rem;
+  font-weight: 700;
+  letter-spacing: .22em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--ladrillo);
+  text-wrap: balance;
+}
+.items { list-style: none; margin: 0; padding: 0; display: grid; gap: .625rem; }
+.fila { display: flex; align-items: baseline; gap: .5rem; }
+.nombre { font-weight: 600; }
+.puntos {
+  flex: 1 1 1rem;
+  min-width: 1rem;
+  border-bottom: 2px dotted var(--sepia);
+  opacity: .45;
+  transform: translateY(-.28em);
+}
+.precio {
+  font-weight: 700;
+  color: var(--ladrillo);
+  font-variant-numeric: lining-nums tabular-nums;
+  white-space: nowrap;
+}
+.desc { display: block; font-size: .9375rem; font-style: italic; color: var(--sepia); }
+.agotado .nombre { opacity: .55; }
+.agotado .precio { font-weight: 600; font-style: italic; color: var(--sepia); }
+
+.seccion.destacada {
+  margin: 1.75rem -1.25rem 0;
+  padding: 1.375rem 1.25rem 1.5rem;
+  background: var(--caja);
+  color: var(--sobre-caja);
+}
+.destacada h2, .destacada .precio, .destacada .desc { color: var(--sobre-caja); }
+.destacada .puntos { border-bottom-color: var(--sobre-caja); opacity: .5; }
+.destacada .agotado .precio { opacity: .75; }
+
+.pie {
+  margin-top: 2.75rem;
+  display: grid;
+  gap: .375rem;
+  justify-items: center;
+  text-align: center;
+  color: var(--sepia);
+  font-size: .875rem;
+}
+.pie p { margin: 0; max-width: 34ch; }
+.pie .marca { margin-bottom: .375rem; font-size: 1.25rem; font-style: italic; font-weight: 600; color: var(--ladrillo); }
+
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<div class="pagina">
+<header class="cabecera">
+<h1><span class="carta">Carta</span><span class="local">Bellaqueo</span></h1>
+<svg class="adorno" viewBox="0 0 240 24" aria-hidden="true" focusable="false">
+<g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round">
+<path d="M3 12 9 6.5 15 12 9 17.5Z"/><path d="M15 12H93"/><path d="M147 12H225"/>
+<path d="M225 12 231 6.5 237 12 231 17.5Z"/>
+<path d="M93 12C99 4.5 111 4.5 120 12C129 19.5 141 19.5 147 12C141 4.5 129 4.5 120 12C111 19.5 99 19.5 93 12Z"/>
+<path d="M86 12 91 9.5M86 12 91 14.5M154 12 149 9.5M154 12 149 14.5"/>
+</g></svg>
+</header>
+<nav class="categorias" aria-label="Categorías de la carta" hidden><div class="chips"></div></nav>
+<div class="estado" id="estado" role="status" aria-live="polite">Cargando carta…</div>
+<div class="aviso" id="aviso" role="status" hidden></div>
+<main id="carta"></main>
+<noscript><p class="estado">Para ver la carta activa JavaScript, o pide la carta impresa en barra.</p></noscript>
+<footer class="pie">
+<p class="marca">Fiestas Bravas</p>
+<p>Prohibida la venta de bebidas alcohólicas a menores de 18 años.</p>
+<p>Tomar bebidas alcohólicas en exceso es dañino.</p>
+</footer>
+</div>
+<script>
+(function () {
+  'use strict';
+
+  var RESPALDO = 'carta.csv';
+  var ESPERA_MS = 8000;
+  var SI = ['si', 'x', '1', 'true', 'yes'];
+  var NO = ['no', 'agotado', 'n', 'false', '0'];
+  var ALIAS = {
+    categoria: ['categoria', 'categorias', 'seccion', 'tipo'],
+    producto: ['producto', 'productos', 'nombre', 'bebida'],
+    detalle: ['detalle', 'descripcion', 'nota', 'presentacion'],
+    precio: ['precio', 'precios', 'precio (s/)', 'costo', 'valor'],
+    disponible: ['disponible', 'stock'],
+    destacar: ['destacar', 'destacada', 'destacado', 'recuadro']
+  };
+  var POSICIONES = { categoria: 0, producto: 1, detalle: 2, precio: 3, disponible: 4, destacar: 5 };
+  var AVISO_RESPALDO = 'No se pudo cargar la carta actualizada. Se muestra la última versión guardada: confirma los precios en barra.';
+
+  var nav = document.querySelector('.categorias');
+  var filaChips = nav.querySelector('.chips');
+  var principal = document.getElementById('carta');
+  var estado = document.getElementById('estado');
+  var aviso = document.getElementById('aviso');
+  var reducir = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  /* ---------------- Lectura de datos ---------------- */
+
+  function normal(texto) {
+    var s = String(texto == null ? '' : texto);
+    if (s.normalize) s = s.normalize('NFD').replace(/[̀-ͯ]/g, '');
+    return s.trim().toLowerCase();
+  }
+
+  // CSV según RFC 4180: comillas, comillas dobles escapadas, saltos dentro de comillas, CRLF y BOM.
+  // Detecta si el separador es coma o punto y coma (Excel en algunos idiomas usa ;).
+  function leerCSV(texto) {
+    texto = String(texto == null ? '' : texto).replace(/^﻿/, '');
+    var primera = texto.split(/\r?\n/, 1)[0] || '';
+    var sep = primera.split(';').length > primera.split(',').length ? ';' : ',';
+    var filas = [], fila = [], campo = '', comillas = false;
+    for (var i = 0; i < texto.length; i++) {
+      var c = texto.charAt(i);
+      if (comillas) {
+        if (c === '"') {
+          if (texto.charAt(i + 1) === '"') { campo += '"'; i++; } else { comillas = false; }
+        } else { campo += c; }
+      } else if (c === '"' && campo === '') {
+        comillas = true;
+      } else if (c === sep) {
+        fila.push(campo); campo = '';
+      } else if (c === '\n' || c === '\r') {
+        if (c === '\r' && texto.charAt(i + 1) === '\n') i++;
+        fila.push(campo); filas.push(fila); fila = []; campo = '';
+      } else {
+        campo += c;
+      }
+    }
+    if (campo !== '' || fila.length) { fila.push(campo); filas.push(fila); }
+    return filas.filter(function (f) {
+      return f.some(function (v) { return String(v).trim() !== ''; });
+    });
+  }
+
+  function columnas(cabecera) {
+    var mapa = {};
+    (cabecera || []).forEach(function (titulo, i) {
+      var n = normal(titulo);
+      Object.keys(ALIAS).forEach(function (clave) {
+        if (mapa[clave] === undefined && ALIAS[clave].indexOf(n) !== -1) mapa[clave] = i;
+      });
+    });
+    return mapa.producto !== undefined && mapa.precio !== undefined ? mapa : null;
+  }
+
+  // Acepta 160 · 160.00 · S/ 160 · 1,350 · 1,350.00 · 1.350 · 12,50. Otro texto (p. ej. "Consultar") se muestra tal cual.
+  function leerPrecio(texto) {
+    var t = String(texto == null ? '' : texto).trim();
+    if (!t) return null;
+    var s = t.replace(/s\/\.?/ig, '').replace(/soles?/ig, '').replace(/\s+/g, '');
+    if (!/^\d[\d.,]*$/.test(s)) return { texto: t };
+    var coma = s.lastIndexOf(','), punto = s.lastIndexOf('.');
+    if (coma !== -1 && punto !== -1) {
+      s = coma > punto ? s.replace(/\./g, '').replace(',', '.') : s.replace(/,/g, '');
+    } else if (coma !== -1) {
+      s = /^\d{1,3}(,\d{3})+$/.test(s) ? s.replace(/,/g, '') : s.replace(',', '.');
+    } else if (punto !== -1 && /^\d{1,3}(\.\d{3})+$/.test(s)) {
+      s = s.replace(/\./g, '');
+    }
+    var n = parseFloat(s);
+    return isNaN(n) ? { texto: t } : { valor: n };
+  }
+
+  function textoPrecio(precio) {
+    if (!precio) return 'Consultar';
+    if (precio.texto) return precio.texto;
+    var v = precio.valor;
+    return 'S/ ' + (Math.round(v) === v ? String(v) : v.toFixed(2));
+  }
+
+  function armarCarta(filas) {
+    if (!filas || !filas.length) return [];
+    var mapa = columnas(filas[0]);
+    var datos = mapa ? filas.slice(1) : filas;
+    mapa = mapa || POSICIONES;
+    var categorias = [], porNombre = {}, ultima = '';
+    datos.forEach(function (fila) {
+      function celda(clave) {
+        var i = mapa[clave];
+        return i === undefined || fila[i] == null ? '' : String(fila[i]).trim();
+      }
+      var nombreCategoria = celda('categoria') || ultima;
+      var producto = celda('producto');
+      if (!nombreCategoria || !producto) return;
+      ultima = nombreCategoria;
+      var clave = normal(nombreCategoria);
+      var cat = porNombre[clave];
+      if (!cat) {
+        cat = { nombre: nombreCategoria, destacada: false, items: [] };
+        porNombre[clave] = cat;
+        categorias.push(cat);
+      }
+      if (SI.indexOf(normal(celda('destacar'))) !== -1) cat.destacada = true;
+      cat.items.push({
+        nombre: producto,
+        detalle: celda('detalle'),
+        precio: leerPrecio(celda('precio')),
+        agotado: NO.indexOf(normal(celda('disponible'))) !== -1
+      });
+    });
+    return categorias;
+  }
+
+  function totalProductos(categorias) {
+    return categorias.reduce(function (n, c) { return n + c.items.length; }, 0);
+  }
+
+  // Respuesta del servicio de Google (gviz) a filas, como si fuera un CSV.
+  function tablaAFilas(tabla) {
+    var filas = [(tabla.cols || []).map(function (c) { return (c && c.label) || ''; })];
+    (tabla.rows || []).forEach(function (r) {
+      filas.push((r && r.c ? r.c : []).map(function (c) {
+        if (!c) return '';
+        if (c.f != null) return String(c.f);
+        return c.v == null ? '' : String(c.v);
+      }));
+    });
+    return filas;
+  }
+
+  /* ---------------- Fuentes de la carta ---------------- */
+
+  // Convierte el enlace pegado en la configuración en las direcciones que se intentan, en orden.
+  function intentosDeHoja(enlace) {
+    enlace = String(enlace || '').trim();
+    if (!enlace) return [];
+    var gid = /[#&?]gid=(\d+)/.exec(enlace);
+    if (/\/spreadsheets\/d\/e\//.test(enlace)) {
+      var pub = enlace.replace(/\/pubhtml/, '/pub').replace(/#.*$/, '');
+      if (!/[?&]output=csv/.test(pub)) pub += (pub.indexOf('?') === -1 ? '?' : '&') + 'output=csv';
+      return [{ tipo: 'csv', url: pub }];
+    }
+    var id = /\/spreadsheets\/d\/([a-zA-Z0-9_-]{20,})/.exec(enlace);
+    if (id) {
+      var base = 'https://docs.google.com/spreadsheets/d/' + id[1] + '/gviz/tq?headers=1' + (gid ? '&gid=' + gid[1] : '');
+      return [
+        { tipo: 'csv', url: base + '&tqx=out:csv' },
+        { tipo: 'jsonp', url: base }
+      ];
+    }
+    return [{ tipo: 'csv', url: enlace }];
+  }
+
+  function traerTexto(url, cache) {
+    return new Promise(function (resolve, reject) {
+      var control = window.AbortController ? new AbortController() : null;
+      var reloj = setTimeout(function () {
+        if (control) control.abort();
+        reject(new Error('Tiempo de espera agotado'));
+      }, ESPERA_MS);
+      fetch(url, { cache: cache || 'no-store', signal: control ? control.signal : undefined })
+        .then(function (r) {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.text();
+        })
+        .then(function (t) { clearTimeout(reloj); resolve(t); },
+              function (e) { clearTimeout(reloj); reject(e); });
+    });
+  }
+
+  // JSONP: carga la hoja como script, así no depende de permisos CORS.
+  var contadorJsonp = 0;
+  function traerJSONP(url) {
+    return new Promise(function (resolve, reject) {
+      var nombre = '__cartaHoja' + (++contadorJsonp);
+      var script = document.createElement('script');
+      var reloj;
+      function limpiar() {
+        clearTimeout(reloj);
+        window[nombre] = function () {};
+        if (script.parentNode) script.parentNode.removeChild(script);
+      }
+      window[nombre] = function (respuesta) {
+        limpiar();
+        if (!respuesta || respuesta.status === 'error' || !respuesta.table) {
+          reject(new Error('La hoja respondió con un error'));
+          return;
+        }
+        resolve(tablaAFilas(respuesta.table));
+      };
+      script.onerror = function () { limpiar(); reject(new Error('No se pudo cargar la hoja')); };
+      reloj = setTimeout(function () { limpiar(); reject(new Error('Tiempo de espera agotado')); }, ESPERA_MS);
+      script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + 'tqx=' +
+        encodeURIComponent('out:json;responseHandler:' + nombre);
+      document.head.appendChild(script);
+    });
+  }
+
+  function leerIntento(intento) {
+    var filas = intento.tipo === 'jsonp'
+      ? traerJSONP(intento.url)
+      : traerTexto(intento.url, intento.cache).then(leerCSV);
+    return filas.then(function (f) {
+      var categorias = armarCarta(f);
+      if (!totalProductos(categorias)) throw new Error('La carta no tiene productos');
+      return categorias;
+    });
+  }
+
+  function primeroQueFuncione(intentos) {
+    return intentos.reduce(function (cadena, intento) {
+      return cadena.catch(function () { return leerIntento(intento); });
+    }, Promise.reject(new Error('Sin fuentes')));
+  }
+
+  /* ---------------- Pantalla ---------------- */
+
+  function crear(etiqueta, clase, texto) {
+    var el = document.createElement(etiqueta);
+    if (clase) el.className = clase;
+    if (texto != null) el.textContent = texto;
+    return el;
+  }
+
+  function slug(texto, usados) {
+    var base = normal(texto).replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'seccion';
+    var id = base, n = 2;
+    while (usados[id]) id = base + '-' + (n++);
+    usados[id] = true;
+    return id;
+  }
+
+  function pintar(categorias) {
+    var usados = { carta: true, estado: true, aviso: true };
+    principal.textContent = '';
+    filaChips.textContent = '';
+    categorias.forEach(function (cat) {
+      var id = slug(cat.nombre, usados);
+      var chip = crear('a', 'chip', cat.nombre);
+      chip.href = '#' + id;
+      chip.setAttribute('data-destino', id);
+      filaChips.appendChild(chip);
+
+      var seccion = crear('section', cat.destacada ? 'seccion destacada' : 'seccion');
+      seccion.id = id;
+      seccion.setAttribute('aria-labelledby', 't-' + id);
+      var titulo = crear('h2', null, cat.nombre);
+      titulo.id = 't-' + id;
+      seccion.appendChild(titulo);
+      var lista = crear('ul', 'items');
+      cat.items.forEach(function (it) {
+        var li = crear('li', it.agotado ? 'item agotado' : 'item');
+        var fila = crear('div', 'fila');
+        fila.appendChild(crear('span', 'nombre', it.nombre));
+        var puntos = crear('span', 'puntos');
+        puntos.setAttribute('aria-hidden', 'true');
+        fila.appendChild(puntos);
+        fila.appendChild(crear('span', 'precio', it.agotado ? 'Agotado' : textoPrecio(it.precio)));
+        li.appendChild(fila);
+        if (it.detalle) li.appendChild(crear('span', 'desc', it.detalle));
+        lista.appendChild(li);
+      });
+      seccion.appendChild(lista);
+      principal.appendChild(seccion);
+    });
+    nav.hidden = categorias.length < 2;
+    prepararNavegacion();
+    if (location.hash.length > 1) {
+      var destino = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+      if (destino) destino.scrollIntoView();
+    }
+  }
+
+  function mostrarEstado(texto) {
+    estado.textContent = texto;
+    estado.hidden = false;
+  }
+
+  function ocultarEstado() {
+    estado.hidden = true;
+    estado.textContent = '';
+  }
+
+  function mostrarError() {
+    estado.textContent = '';
+    estado.appendChild(crear('p', null, 'No se pudo cargar la carta. Revisa tu conexión e inténtalo de nuevo, o pide la carta impresa en barra.'));
+    var boton = crear('button', 'reintentar', 'Reintentar');
+    boton.type = 'button';
+    boton.addEventListener('click', cargar);
+    estado.appendChild(boton);
+    estado.hidden = false;
+  }
+
+  /* ---------------- Barra de categorías ---------------- */
+
+  var chips = [], secciones = [], actual = null, bloqueo = 0, pendiente = false;
+
+  function centrarChip(chip) {
+    var izq = chip.offsetLeft - (filaChips.clientWidth - chip.offsetWidth) / 2;
+    try { filaChips.scrollTo({ left: izq, behavior: reducir ? 'auto' : 'smooth' }); }
+    catch (e) { filaChips.scrollLeft = izq; }
+  }
+
+  function activar(id) {
+    if (id === actual) return;
+    actual = id;
+    chips.forEach(function (c) {
+      if (c.getAttribute('data-destino') === id) {
+        c.setAttribute('aria-current', 'true');
+        centrarChip(c);
+      } else {
+        c.removeAttribute('aria-current');
+      }
+    });
+  }
+
+  function revisar() {
+    if (!secciones.length || nav.hidden || Date.now() < bloqueo) return;
+    var limite = nav.getBoundingClientRect().bottom + 24;
+    var id = secciones[0].id;
+    for (var i = 0; i < secciones.length; i++) {
+      if (secciones[i].getBoundingClientRect().top <= limite) id = secciones[i].id;
+    }
+    var raiz = document.documentElement;
+    if (window.scrollY > 0 && window.innerHeight + window.scrollY >= raiz.scrollHeight - 4) {
+      id = secciones[secciones.length - 1].id;
+    }
+    activar(id);
+  }
+
+  function prepararNavegacion() {
+    chips = Array.prototype.slice.call(filaChips.querySelectorAll('.chip'));
+    secciones = chips.map(function (c) { return document.getElementById(c.getAttribute('data-destino')); });
+    actual = null;
+    chips.forEach(function (c) {
+      c.addEventListener('click', function (ev) {
+        var destino = document.getElementById(c.getAttribute('data-destino'));
+        if (!destino) return;
+        ev.preventDefault();
+        bloqueo = Date.now() + 1200;
+        activar(destino.id);
+        destino.scrollIntoView({ behavior: reducir ? 'auto' : 'smooth', block: 'start' });
+        if (window.history && history.replaceState) history.replaceState(null, '', '#' + destino.id);
+      });
+    });
+    revisar();
+  }
+
+  window.addEventListener('scroll', function () {
+    if (pendiente) return;
+    pendiente = true;
+    requestAnimationFrame(function () { pendiente = false; revisar(); });
+  }, { passive: true });
+  window.addEventListener('scrollend', function () { bloqueo = 0; });
+
+  /* ---------------- Carga ---------------- */
+
+  function cargar() {
+    mostrarEstado('Cargando carta…');
+    aviso.hidden = true;
+    var hoja = intentosDeHoja(window.HOJA_DE_GOOGLE);
+    primeroQueFuncione(hoja)
+      .then(function (categorias) {
+        pintar(categorias);
+        ocultarEstado();
+      }, function () {
+        return primeroQueFuncione([{ tipo: 'csv', url: RESPALDO, cache: 'no-cache' }]).then(function (categorias) {
+          pintar(categorias);
+          ocultarEstado();
+          if (hoja.length) {
+            aviso.textContent = AVISO_RESPALDO;
+            aviso.hidden = false;
+          }
+        });
+      })
+      .catch(mostrarError);
+  }
+
+  // Para revisar desde la consola del navegador si algo falla.
+  window.CartaBellaqueo = {
+    leerCSV: leerCSV, leerPrecio: leerPrecio, armarCarta: armarCarta,
+    intentosDeHoja: intentosDeHoja, tablaAFilas: tablaAFilas, traerJSONP: traerJSONP, recargar: cargar
+  };
+
+  cargar();
+})();
+</script>
+</body>
+</html>
