@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
@@ -170,6 +170,9 @@ body {
 }
 .desc { display: block; font-size: .9375rem; font-style: italic; color: var(--sepia); }
 .agotado .nombre { opacity: .55; }
+.item.con-foto { display: grid; grid-template-columns: 4rem minmax(0, 1fr); gap: .875rem; align-items: center; }
+.foto { display: block; width: 4rem; height: 4rem; object-fit: cover; border-radius: .5rem; border: 1px solid var(--sepia); }
+.agotado .foto { opacity: .5; }
 .agotado .precio { font-weight: 600; font-style: italic; color: var(--sepia); }
 
 .seccion.destacada {
@@ -234,7 +237,8 @@ body {
     detalle: ['detalle', 'descripcion', 'nota', 'presentacion'],
     precio: ['precio', 'precios', 'precio (s/)', 'costo', 'valor'],
     disponible: ['disponible', 'stock'],
-    destacar: ['destacar', 'destacada', 'destacado', 'recuadro']
+    destacar: ['destacar', 'destacada', 'destacado', 'recuadro'],
+    imagen: ['imagen', 'imagenes', 'foto', 'fotos', 'image', 'img']
   };
   var POSICIONES = { categoria: 0, producto: 1, detalle: 2, precio: 3, disponible: 4, destacar: 5 };
   var AVISO_RESPALDO = 'No se pudo cargar la carta actualizada. Se muestra la última versión guardada: confirma los precios en barra.';
@@ -347,10 +351,20 @@ body {
         nombre: producto,
         detalle: celda('detalle'),
         precio: leerPrecio(celda('precio')),
-        agotado: NO.indexOf(normal(celda('disponible'))) !== -1
+        agotado: NO.indexOf(normal(celda('disponible'))) !== -1,
+        imagen: urlImagen(celda('imagen'))
       });
     });
     return categorias;
+  }
+
+  // Acepta img/foto.jpg (subida a GitHub), un enlace directo https://... o un enlace de Google Drive.
+  function urlImagen(texto) {
+    var t = String(texto == null ? '' : texto).trim();
+    if (!t) return '';
+    var drive = /drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=\w+&)?id=)([a-zA-Z0-9_-]{20,})/.exec(t);
+    if (drive) return 'https://drive.google.com/thumbnail?id=' + drive[1] + '&sz=w400';
+    return t;
   }
 
   function totalProductos(categorias) {
@@ -492,14 +506,32 @@ body {
       var lista = crear('ul', 'items');
       cat.items.forEach(function (it) {
         var li = crear('li', it.agotado ? 'item agotado' : 'item');
+        var contenido = li;
+        if (it.imagen) {
+          li.className += ' con-foto';
+          var foto = crear('img', 'foto');
+          foto.alt = '';
+          foto.loading = 'lazy';
+          foto.decoding = 'async';
+          foto.width = 64;
+          foto.height = 64;
+          foto.addEventListener('error', function () {
+            li.classList.remove('con-foto');
+            if (foto.parentNode) foto.parentNode.removeChild(foto);
+          });
+          foto.src = it.imagen;
+          li.appendChild(foto);
+          contenido = crear('div', 'texto');
+          li.appendChild(contenido);
+        }
         var fila = crear('div', 'fila');
         fila.appendChild(crear('span', 'nombre', it.nombre));
         var puntos = crear('span', 'puntos');
         puntos.setAttribute('aria-hidden', 'true');
         fila.appendChild(puntos);
         fila.appendChild(crear('span', 'precio', it.agotado ? 'Agotado' : textoPrecio(it.precio)));
-        li.appendChild(fila);
-        if (it.detalle) li.appendChild(crear('span', 'desc', it.detalle));
+        contenido.appendChild(fila);
+        if (it.detalle) contenido.appendChild(crear('span', 'desc', it.detalle));
         lista.appendChild(li);
       });
       seccion.appendChild(lista);
@@ -621,7 +653,7 @@ body {
   // Para revisar desde la consola del navegador si algo falla.
   window.CartaBellaqueo = {
     leerCSV: leerCSV, leerPrecio: leerPrecio, armarCarta: armarCarta,
-    intentosDeHoja: intentosDeHoja, tablaAFilas: tablaAFilas, traerJSONP: traerJSONP, recargar: cargar
+    intentosDeHoja: intentosDeHoja, tablaAFilas: tablaAFilas, traerJSONP: traerJSONP, urlImagen: urlImagen, recargar: cargar
   };
 
   cargar();
