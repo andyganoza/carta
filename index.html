@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="dark">
+<html lang="es">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,106 +15,104 @@
 <meta property="og:title" content="Carta Bellaqueo">
 <meta property="og:description" content="Mira la carta de Bellaqueo desde tu celular.">
 <meta property="og:type" content="website">
-<meta name="theme-color" content="#1D1411">
-<script>
-/* ====================  MODO CLARO / OSCURO  ====================
-  Cómo se ve la carta al entrar: 'dark' = oscuro, 'light' = claro,
-  'auto' = igual que el celular. Si el cliente toca el botón de la
-  esquina, su elección se recuerda en su celular.
-================================================================ */
-window.TEMA_INICIAL = 'dark';
-(function () {
-  var tema = window.TEMA_INICIAL;
-  try { tema = localStorage.getItem('tema') || tema; } catch (e) {}
-  if (tema === 'auto') {
-    tema = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  }
-  tema = tema === 'light' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', tema);
-  var color = document.querySelector('meta[name="theme-color"]');
-  if (color) color.setAttribute('content', tema === 'dark' ? '#1D1411' : '#F5EDDC');
-})();
-</script>
+<meta name="theme-color" content="#120806">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2396362A'/%3E%3Ctext x='32' y='45' font-family='Georgia,serif' font-size='38' font-weight='700' text-anchor='middle' fill='%23F5EDDC'%3EB%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,700;1,800&amp;family=Barlow:wght@500;600&amp;display=swap" rel="stylesheet">
 <style>
 :root {
-  /* Una columna para celular: encabezado como la carta impresa, barra de categorías fija y filas con puntos guía hasta el precio */
-  --papel: #F5EDDC;
-  --tinta: #2E211A;
-  --ladrillo: #96362A;
-  --sepia: #6F5C4C;
-  --caja: #8F3B2B;
-  --sobre-caja: #F7EFDF;
-  --serif: "Fraunces", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-  --barra: 3.75rem;
-  color-scheme: light;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --papel: #1D1411;
-    --tinta: #F2E7D3;
-    --ladrillo: #E39178;
-    --sepia: #B8A691;
-    --caja: #7E2E20;
-    --sobre-caja: #F7EFDF;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --papel: #1D1411;
-  --tinta: #F2E7D3;
-  --ladrillo: #E39178;
-  --sepia: #B8A691;
-  --caja: #7E2E20;
-  --sobre-caja: #F7EFDF;
+  /* Una columna para celular en modo noche: dorado sobre negro tostado, como los flyers de Bellaqueo */
+  --noche: #120806;
+  --oro: #f5b941;
+  --oro-claro: #ffe8a3;
+  --brasa: #ff5a1f;
+  --crema: #f7ead7;
+  --humo: #b9a08c;
+  --titular: "Barlow Condensed", "TeX Gyre Heros Cn", "Avenir Next Condensed", "Arial Narrow", "Roboto Condensed", sans-serif-condensed, sans-serif;
+  --texto: "Barlow", "Segoe UI", Roboto, system-ui, sans-serif;
+  --barra: 3.9rem;
   color-scheme: dark;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; background: var(--noche); }
 body {
   margin: 0;
-  background: var(--papel);
-  color: var(--tinta);
-  font-family: var(--serif);
+  min-height: 100vh;
+  background:
+    radial-gradient(120% 55% at 50% -12%, rgba(255, 122, 26, .30), transparent 62%),
+    radial-gradient(90% 40% at 50% 108%, rgba(196, 30, 12, .22), transparent 60%),
+    var(--noche);
+  color: var(--crema);
+  font-family: var(--texto);
   font-size: 1.0625rem;
   line-height: 1.4;
 }
-.pagina { max-width: 34rem; margin: 0 auto; padding: 0 1.25rem 2.5rem; }
+.pagina { position: relative; z-index: 1; max-width: 34rem; margin: 0 auto; padding: 0 1.25rem 2.5rem; }
 
-.cabecera { padding: 2.25rem 0 1.25rem; text-align: center; }
-.cabecera h1 { margin: 0; display: grid; gap: .625rem; justify-items: center; font-weight: 400; }
-.cabecera .carta {
-  font-size: clamp(3.75rem, 21vw, 6rem);
-  font-weight: 900;
-  line-height: .9;
-  letter-spacing: .01em;
-  text-transform: uppercase;
-  color: var(--ladrillo);
+/* Brasas que suben despacio (decorativas) */
+.brasas { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.brasas i {
+  position: absolute; bottom: -12px; width: 4px; height: 4px; border-radius: 50%;
+  background: #ffc36b; box-shadow: 0 0 8px 2px rgba(255, 120, 30, .75); opacity: 0;
+  animation: subir 11s linear infinite;
 }
-.cabecera .local {
-  font-size: clamp(1.125rem, 5.2vw, 1.5rem);
-  font-weight: 500;
-  letter-spacing: .42em;
-  margin-right: -.42em;
-  text-transform: uppercase;
+.brasas i:nth-child(1) { left: 6%; animation-duration: 12s; }
+.brasas i:nth-child(2) { left: 17%; animation-delay: 3s; width: 3px; height: 3px; }
+.brasas i:nth-child(3) { left: 29%; animation-delay: 7s; animation-duration: 14s; }
+.brasas i:nth-child(4) { left: 41%; animation-delay: 1.5s; width: 5px; height: 5px; }
+.brasas i:nth-child(5) { left: 53%; animation-delay: 9s; animation-duration: 13s; width: 3px; height: 3px; }
+.brasas i:nth-child(6) { left: 64%; animation-delay: 4.5s; }
+.brasas i:nth-child(7) { left: 75%; animation-delay: 11s; animation-duration: 15s; width: 5px; height: 5px; }
+.brasas i:nth-child(8) { left: 86%; animation-delay: 6s; width: 3px; height: 3px; }
+.brasas i:nth-child(9) { left: 94%; animation-delay: 2s; animation-duration: 12.5s; }
+.brasas i:nth-child(10) { left: 47%; animation-delay: 13s; animation-duration: 16s; }
+@keyframes subir {
+  0% { transform: translate(0, 0); opacity: 0; }
+  10% { opacity: .9; }
+  75% { opacity: .55; }
+  100% { transform: translate(-24px, -108vh); opacity: 0; }
 }
-.adorno { display: block; width: min(15rem, 72%); height: auto; margin: 1rem auto 0; color: var(--ladrillo); }
-.fecha { margin: .75rem 0 0; color: var(--sepia); font-size: .9375rem; font-style: italic; }
-.categorias { position: sticky; top: 0; z-index: 5; margin: 0 -1.25rem; background: var(--papel); }
+
+/* Encabezado */
+.cabecera { padding: 2rem 0 1.25rem; text-align: center; }
+.logo { display: block; width: min(15rem, 72%); height: auto; margin: 0 auto .375rem; filter: drop-shadow(0 0 18px rgba(255, 140, 40, .35)); }
+.cabecera h1 { margin: 0; display: grid; gap: .125rem; justify-items: center; font-weight: 400; }
+.marca-texto, .titulo {
+  font-family: var(--titular);
+  font-weight: 800;
+  font-style: italic;
+  line-height: .95;
+  text-transform: uppercase;
+  color: var(--oro);
+  filter: drop-shadow(0 0 14px rgba(255, 140, 40, .45));
+}
+.marca-texto { font-size: clamp(3.25rem, 17vw, 5rem); letter-spacing: .01em; }
+.titulo { font-size: clamp(2.5rem, 12.5vw, 3.6rem); letter-spacing: .03em; padding: 0 .1em; }
+.hay-logo .marca-texto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.fecha {
+  margin: .625rem 0 0;
+  font-family: var(--titular);
+  font-weight: 600;
+  font-size: 1.0625rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--humo);
+}
+
+/* Barra de categorías */
+.categorias { position: sticky; top: 0; z-index: 5; margin: 0 -1.25rem; background: rgba(18, 8, 6, .98); }
 .categorias::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
-  background: var(--sepia); opacity: .3;
+  background: linear-gradient(90deg, transparent, var(--oro), transparent); opacity: .7;
 }
 .chips {
   position: relative;
   display: flex;
   gap: .5rem;
   overflow-x: auto;
-  padding: .625rem 1.25rem;
+  padding: .7rem 1.25rem;
   scrollbar-width: none;
   overscroll-behavior-x: contain;
 }
@@ -124,137 +122,179 @@ body {
   display: inline-flex;
   align-items: center;
   min-height: 2.5rem;
-  padding: 0 1rem;
-  border: 1px solid var(--sepia);
+  padding: 0 1.1rem;
+  border: 1px solid rgba(245, 185, 65, .55);
   border-radius: 999px;
-  color: var(--tinta);
-  font-size: .9375rem;
-  font-weight: 600;
+  background: rgba(255, 255, 255, .03);
+  color: var(--crema);
+  font-family: var(--titular);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
   text-decoration: none;
   white-space: nowrap;
 }
-.chip[aria-current="true"] { background: var(--ladrillo); border-color: var(--ladrillo); color: var(--papel); }
-.chip:focus-visible { outline: 2px solid var(--ladrillo); outline-offset: 2px; }
+.chip[aria-current="true"] {
+  background: linear-gradient(180deg, var(--oro-claro), var(--oro) 60%, #d18a1c);
+  border-color: transparent;
+  color: var(--noche);
+  box-shadow: 0 0 16px rgba(245, 185, 65, .45);
+}
+.chip:focus-visible { outline: 2px solid var(--oro-claro); outline-offset: 2px; }
 
-.estado { margin: 2rem 0 0; color: var(--sepia); font-style: italic; text-align: center; }
+/* Estados */
+.estado { margin: 2rem 0 0; color: var(--humo); text-align: center; }
 .estado p { margin: 0 auto; max-width: 30ch; }
 .reintentar {
   margin-top: 1rem;
   min-height: 2.75rem;
-  padding: 0 1.25rem;
+  padding: 0 1.4rem;
   border: 0;
   border-radius: 999px;
-  background: var(--ladrillo);
-  color: var(--papel);
-  font: inherit;
-  font-style: normal;
+  background: linear-gradient(180deg, var(--oro-claro), var(--oro));
+  color: var(--noche);
+  font-family: var(--titular);
+  font-size: 1.0625rem;
   font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
   cursor: pointer;
 }
-.reintentar:focus-visible { outline: 2px solid var(--ladrillo); outline-offset: 3px; }
+.reintentar:focus-visible { outline: 2px solid var(--oro-claro); outline-offset: 3px; }
 .aviso {
   margin: 1.25rem 0 0;
   padding: .75rem 1rem;
-  border: 1px solid var(--ladrillo);
+  border: 1px solid var(--brasa);
+  border-radius: .5rem;
+  background: rgba(255, 90, 31, .08);
   font-size: .9375rem;
 }
 
-.seccion { padding-top: 1.75rem; scroll-margin-top: var(--barra); }
+/* Secciones y productos */
+.seccion { padding-top: 2rem; scroll-margin-top: var(--barra); }
 .seccion h2 {
-  margin: 0 0 .75rem;
-  font-size: 1.375rem;
-  font-weight: 700;
-  letter-spacing: .22em;
-  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin: 0 0 .875rem;
+  font-family: var(--titular);
+  font-size: 2.05rem;
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: .04em;
+  line-height: 1.05;
   text-transform: uppercase;
-  color: var(--ladrillo);
-  text-wrap: balance;
+  color: var(--oro);
 }
-.items { list-style: none; margin: 0; padding: 0; display: grid; gap: .625rem; }
+.seccion h2::after {
+  content: ""; flex: 1; height: 2px; min-width: 2rem;
+  background: linear-gradient(90deg, var(--oro), transparent); opacity: .55;
+}
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .marca-texto, .titulo {
+    background: linear-gradient(180deg, var(--oro-claro) 0%, var(--oro) 46%, #c77d14 56%, var(--oro-claro) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+.items { list-style: none; margin: 0; padding: 0; display: grid; gap: .8rem; }
 .fila { display: flex; align-items: baseline; gap: .5rem; }
-.nombre { font-weight: 600; }
+.nombre { font-weight: 600; color: var(--crema); }
 .puntos {
   flex: 1 1 1rem;
   min-width: 1rem;
-  border-bottom: 2px dotted var(--sepia);
-  opacity: .45;
+  border-bottom: 2px dotted var(--oro);
+  opacity: .35;
   transform: translateY(-.28em);
 }
 .precio {
+  font-family: var(--titular);
+  font-size: 1.4rem;
   font-weight: 700;
-  color: var(--ladrillo);
+  letter-spacing: .02em;
+  color: var(--oro);
   font-variant-numeric: lining-nums tabular-nums;
   white-space: nowrap;
 }
-.desc { display: block; font-size: .9375rem; font-style: italic; color: var(--sepia); }
-.agotado .nombre { opacity: .55; }
-.item.con-foto { display: grid; grid-template-columns: 4rem minmax(0, 1fr); gap: .875rem; align-items: center; }
-.foto { display: block; width: 4rem; height: 4rem; object-fit: contain; padding: .25rem; background: #fff; border-radius: .5rem; border: 1px solid var(--sepia); }
-.agotado .foto { opacity: .5; }
-.agotado .precio { font-weight: 600; font-style: italic; color: var(--sepia); }
-
-.seccion.destacada {
-  margin: 1.75rem -1.25rem 0;
-  padding: 1.375rem 1.25rem 1.5rem;
-  background: var(--caja);
-  color: var(--sobre-caja);
+.desc { display: block; font-size: .9375rem; color: var(--humo); }
+.agotado .nombre { opacity: .5; text-decoration: line-through; text-decoration-color: rgba(255, 90, 31, .75); }
+.agotado .precio { font-size: 1rem; letter-spacing: .1em; text-transform: uppercase; color: var(--brasa); }
+.item.con-foto { display: grid; grid-template-columns: 4.25rem minmax(0, 1fr); gap: .9rem; align-items: center; }
+.foto {
+  display: block;
+  width: 4.25rem;
+  height: 4.25rem;
+  object-fit: contain;
+  padding: .3rem;
+  border-radius: .75rem;
+  /* Blanco puro: así las fotos JPG con fondo blanco y los PNG transparentes se ven igual */
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(245, 185, 65, .8), 0 0 14px rgba(245, 185, 65, .22), 0 6px 18px rgba(0, 0, 0, .45);
 }
-.destacada h2, .destacada .precio, .destacada .desc { color: var(--sobre-caja); }
-.destacada .puntos { border-bottom-color: var(--sobre-caja); opacity: .5; }
-.destacada .agotado .precio { opacity: .75; }
+.agotado .foto { filter: grayscale(1); opacity: .5; }
+/* Imagen de categoría (columna "banner"), si se usa */
+.banner {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 5 / 2;
+  object-fit: cover;
+  margin: 0 0 1rem;
+  border-radius: .75rem;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(245, 185, 65, .7), 0 8px 22px rgba(0, 0, 0, .5);
+}
 
+/* Categoría destacada (columna "destacar") */
+.seccion.destacada {
+  margin: 2rem -1.25rem 0;
+  padding: 1.5rem 1.25rem 1.625rem;
+  background: linear-gradient(160deg, #8a1d0e 0%, #4a0f08 55%, #2a0905 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 232, 163, .35), inset 0 -1px 0 rgba(255, 232, 163, .2);
+}
+.destacada h2 { color: var(--oro-claro); }
+.destacada .precio { color: var(--oro-claro); }
+.destacada .puntos { border-bottom-color: var(--oro-claro); }
+.destacada .desc { color: #ecd6c0; }
+
+/* Pie */
 .pie {
-  margin-top: 2.75rem;
+  margin-top: 3rem;
   display: grid;
   gap: .375rem;
   justify-items: center;
   text-align: center;
-  color: var(--sepia);
+  color: var(--humo);
   font-size: .875rem;
 }
 .pie p { margin: 0; max-width: 34ch; }
-.pie .marca { margin-bottom: .375rem; font-size: 1.25rem; font-style: italic; font-weight: 600; color: var(--ladrillo); }
-
-@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
-/* Botón de modo claro / oscuro (esquina superior derecha) */
-.cabecera { position: relative; padding-top: 3.25rem; }
-.tema {
-  position: absolute;
-  top: .5rem;
-  right: 0;
-  display: grid;
-  place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  padding: 0;
-  border: 1px solid var(--sepia);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--tinta);
-  cursor: pointer;
+.pie .marca {
+  margin-bottom: .375rem;
+  font-family: var(--titular);
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--oro);
 }
-.tema:focus-visible { outline: 2px solid var(--ladrillo); outline-offset: 2px; }
-.tema svg { display: block; width: 1.25rem; height: 1.25rem; }
-.tema .sol, :root[data-theme="dark"] .tema .luna { display: none; }
-:root[data-theme="dark"] .tema .sol { display: block; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto !important; }
+  .brasas { display: none; }
+}
 </style>
 </head>
 <body>
+<div class="brasas" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
 <div class="pagina">
 <header class="cabecera">
-<button class="tema" id="tema" type="button" aria-label="Cambiar a modo claro" title="Cambiar a modo claro">
-<svg class="sol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
-<svg class="luna" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-</button>
-<h1><span class="carta">Carta</span><span class="local">Bellaqueo</span></h1>
-<svg class="adorno" viewBox="0 0 240 24" aria-hidden="true" focusable="false">
-<g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round">
-<path d="M3 12 9 6.5 15 12 9 17.5Z"/><path d="M15 12H93"/><path d="M147 12H225"/>
-<path d="M225 12 231 6.5 237 12 231 17.5Z"/>
-<path d="M93 12C99 4.5 111 4.5 120 12C129 19.5 141 19.5 147 12C141 4.5 129 4.5 120 12C111 19.5 99 19.5 93 12Z"/>
-<path d="M86 12 91 9.5M86 12 91 14.5M154 12 149 9.5M154 12 149 14.5"/>
-</g></svg>
-<p class="fecha" id="fecha"></p></header>
+<img class="logo" src="img/logo-bellaqueo.png" alt="Bellaqueo" width="512" height="232" onload="document.documentElement.classList.add('hay-logo')" onerror="this.remove()">
+<h1><span class="marca-texto">Bellaqueo</span><span class="titulo">La carta</span></h1>
+<p class="fecha" id="fecha"></p>
+</header>
 <nav class="categorias" aria-label="Categorías de la carta" hidden><div class="chips"></div></nav>
 <div class="estado" id="estado" role="status" aria-live="polite">Cargando carta…</div>
 <div class="aviso" id="aviso" role="status" hidden></div>
@@ -281,7 +321,8 @@ body {
     precio: ['precio', 'precios', 'precio (s/)', 'costo', 'valor'],
     disponible: ['disponible', 'stock'],
     destacar: ['destacar', 'destacada', 'destacado', 'recuadro'],
-    imagen: ['imagen', 'imagenes', 'foto', 'fotos', 'image', 'img']
+    imagen: ['imagen', 'imagenes', 'foto', 'fotos', 'image', 'img'],
+    banner: ['banner', 'portada', 'imagen categoria', 'imagen de categoria', 'foto categoria']
   };
   var POSICIONES = { categoria: 0, producto: 1, detalle: 2, precio: 3, disponible: 4, destacar: 5 };
   var AVISO_RESPALDO = 'No se pudo cargar la carta actualizada. Se muestra la última versión guardada: confirma los precios en barra.';
@@ -390,6 +431,7 @@ body {
         categorias.push(cat);
       }
       if (SI.indexOf(normal(celda('destacar'))) !== -1) cat.destacada = true;
+      if (!cat.banner && celda('banner')) cat.banner = urlImagen(celda('banner'));
       cat.items.push({
         nombre: producto,
         detalle: celda('detalle'),
@@ -546,6 +588,17 @@ body {
       var titulo = crear('h2', null, cat.nombre);
       titulo.id = 't-' + id;
       seccion.appendChild(titulo);
+      if (cat.banner) {
+        var banner = crear('img', 'banner');
+        banner.alt = '';
+        banner.loading = 'lazy';
+        banner.decoding = 'async';
+        banner.width = 1200;
+        banner.height = 480;
+        banner.addEventListener('error', function () { if (banner.parentNode) banner.parentNode.removeChild(banner); });
+        banner.src = cat.banner;
+        seccion.appendChild(banner);
+      }
       var lista = crear('ul', 'items');
       cat.items.forEach(function (it) {
         var li = crear('li', it.agotado ? 'item agotado' : 'item');
@@ -711,28 +764,6 @@ body {
   }
   mostrarFecha();
   setInterval(mostrarFecha, 60000);
-})();
-</script>
-<script>
-/* Botón de modo claro / oscuro: cambia el tema y recuerda la elección. */
-(function () {
-  var raiz = document.documentElement;
-  var boton = document.getElementById('tema');
-  var color = document.querySelector('meta[name="theme-color"]');
-  if (!boton) return;
-  function actualizarBoton() {
-    var texto = raiz.getAttribute('data-theme') === 'dark' ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
-    boton.setAttribute('aria-label', texto);
-    boton.title = texto;
-  }
-  boton.addEventListener('click', function () {
-    var nuevo = raiz.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    raiz.setAttribute('data-theme', nuevo);
-    if (color) color.setAttribute('content', nuevo === 'dark' ? '#1D1411' : '#F5EDDC');
-    try { localStorage.setItem('tema', nuevo); } catch (e) {}
-    actualizarBoton();
-  });
-  actualizarBoton();
 })();
 </script>
 </body>
